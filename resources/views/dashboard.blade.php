@@ -158,7 +158,7 @@
                         <div class="w-full h-64 bg-gradient-to-br from-red-900 to-black rounded-lg relative">
                             <canvas id="mclaren-canvas" class="w-full h-full rounded-lg"></canvas>
                             <div class="absolute bottom-2 left-2 bg-black/70 px-3 py-1 rounded text-xs text-white">
-                                🖱️ Arrastra para rotar
+                                🖱️ Arrastra para rotar | ✋ Shift + Arrastre para mover
                             </div>
                         </div>
                         <div class="mt-4 text-slate-300 text-xs space-y-1">
@@ -175,7 +175,7 @@
                         <div class="w-full h-64 bg-gradient-to-br from-blue-900 to-black rounded-lg relative">
                             <canvas id="f1-2026-canvas" class="w-full h-full rounded-lg"></canvas>
                             <div class="absolute bottom-2 left-2 bg-black/70 px-3 py-1 rounded text-xs text-white">
-                                🖱️ Arrastra para rotar
+                                🖱️ Arrastra para rotar | ✋ Shift + Arrastre para mover
                             </div>
                         </div>
                         <div class="mt-4 text-slate-300 text-xs space-y-1">
@@ -192,7 +192,7 @@
                         <div class="w-full h-64 bg-gradient-to-br from-amber-900 to-black rounded-lg relative">
                             <canvas id="gt40-canvas" class="w-full h-full rounded-lg"></canvas>
                             <div class="absolute bottom-2 left-2 bg-black/70 px-3 py-1 rounded text-xs text-white">
-                                🖱️ Arrastra para rotar
+                                🖱️ Arrastra para rotar | ✋ Shift + Arrastre para mover
                             </div>
                         </div>
                         <div class="mt-4 text-slate-300 text-xs space-y-1">
@@ -605,15 +605,15 @@
             scene.background = new THREE.Color(0x1a1a1a);
 
             const camera = new THREE.PerspectiveCamera(45, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
-            camera.position.set(0, 1, cameraZ);
+            camera.position.set(0, 2, cameraZ);
 
             const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
             renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-            // Luces
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            // Luces mejoradas
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
 
             const spotLight1 = new THREE.SpotLight(0xffffff, 1.5);
@@ -625,17 +625,28 @@
             spotLight2.position.set(-5, 8, -5);
             scene.add(spotLight2);
 
-            const fillLight = new THREE.DirectionalLight(0x6699ff, 0.3);
+            const fillLight = new THREE.DirectionalLight(0x6699ff, 0.4);
             fillLight.position.set(0, 5, -10);
             scene.add(fillLight);
 
-            // Controles
+            // Controles - SIN ZOOM pero con movimiento
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 1.5;
+            controls.enableZoom = false;  // ❌ Deshabilitar zoom
+            controls.enablePan = true;    // ✅ Permitir mover
             controls.maxPolarAngle = Math.PI / 2;
+            controls.minPolarAngle = 0;
+
+            // Grupo para centrar el modelo correctamente
+            const modelGroup = new THREE.Group();
+            scene.add(modelGroup);
+
+            // Variables para rotación por pasos
+            let currentStep = 0;
+            const rotationSteps = [0, Math.PI / 2, Math.PI, Math.PI * 1.5]; // 0°, 90°, 180°, 270°
+            let targetRotation = 0;
+            let currentRotation = 0;
 
             // Cargar modelo
             const loader = new THREE.GLTFLoader();
@@ -644,28 +655,25 @@
                 function (gltf) {
                     const model = gltf.scene;
                     
-                    // Calcular bounding box para centrar
+                    // Calcular bounding box para centrar PERFECTAMENTE
                     const box = new THREE.Box3().setFromObject(model);
                     const center = box.getCenter(new THREE.Vector3());
                     const size = box.getSize(new THREE.Vector3());
                     
-                    // Centrar modelo
-                    model.position.x = -center.x;
-                    model.position.y = -center.y;
-                    model.position.z = -center.z;
+                    // Centrar el modelo en el origen
+                    model.position.set(-center.x, -center.y, -center.z);
                     
-                    // Escalar apropiadamente
+                    // Escalar apropiadamente para que quepa bien
                     const maxDim = Math.max(size.x, size.y, size.z);
-                    const scale = 2 / maxDim;
+                    const scale = 2.5 / maxDim;
                     model.scale.set(scale, scale, scale);
                     
-                    // Habilitar sombras
+                    // Habilitar sombras y mejorar materiales
                     model.traverse(function (node) {
                         if (node.isMesh) {
                             node.castShadow = true;
                             node.receiveShadow = true;
                             
-                            // Mejorar materiales
                             if (node.material) {
                                 node.material.metalness = 0.7;
                                 node.material.roughness = 0.3;
@@ -673,7 +681,8 @@
                         }
                     });
                     
-                    scene.add(model);
+                    // Agregar al grupo (esto permite rotación alrededor del centro real)
+                    modelGroup.add(model);
                 },
                 function (xhr) {
                     console.log(canvasId + ': ' + (xhr.loaded / xhr.total * 100) + '% cargado');
@@ -685,12 +694,32 @@
 
             // Suelo con grid
             const gridHelper = new THREE.GridHelper(10, 10, 0x333333, 0x222222);
-            gridHelper.position.y = -1;
+            gridHelper.position.y = -1.5;
             scene.add(gridHelper);
 
-            // Animación
+            // Rotación por pasos cada 3 segundos
+            setInterval(() => {
+                currentStep = (currentStep + 1) % rotationSteps.length;
+                targetRotation = rotationSteps[currentStep];
+            }, 3000);
+
+            // Animación con rotación suave hacia el target
             function animate() {
                 requestAnimationFrame(animate);
+                
+                // Interpolación suave hacia la rotación objetivo
+                const rotationSpeed = 0.05;
+                let diff = targetRotation - currentRotation;
+                
+                // Normalizar la diferencia para tomar el camino más corto
+                if (diff > Math.PI) diff -= Math.PI * 2;
+                if (diff < -Math.PI) diff += Math.PI * 2;
+                
+                currentRotation += diff * rotationSpeed;
+                
+                // Aplicar rotación al grupo del modelo
+                modelGroup.rotation.y = currentRotation;
+                
                 controls.update();
                 renderer.render(scene, camera);
             }
