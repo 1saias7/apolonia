@@ -93,13 +93,17 @@
                             <option>2022</option>
                         </select>
                     </div>
-                    <canvas id="monthlySalesChart" class="w-full" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="monthlySalesChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- Distribución por Categoría -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">🏁 Distribución por Categoría</h3>
-                    <canvas id="categoryChart" class="w-full" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -108,13 +112,17 @@
                 <!-- Top 5 Vehículos -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">🏆 Top 5 Vehículos Más Vendidos</h3>
-                    <canvas id="topVehiclesChart" class="w-full" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="topVehiclesChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- Rendimiento Regional -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">🌎 Rendimiento por Región</h3>
-                    <canvas id="regionalChart" class="w-full" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="regionalChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -123,13 +131,17 @@
                 <!-- Gastos Operacionales -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Estructura de Gastos Operacionales</h3>
-                    <canvas id="expensesChart" class="w-full" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="expensesChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- Márgenes de Utilidad -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Análisis de Márgenes</h3>
-                    <canvas id="marginsChart" class="w-full" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="marginsChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -716,9 +728,29 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
+        /* FIX CRÍTICO: Contenedores de gráficos con altura fija */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Prevenir que los canvas crezcan infinitamente */
+        .chart-container canvas {
+            max-height: 300px !important;
+        }
+
         /* Estilos para Canvas 3D */
         canvas {
             display: block;
+        }
+
+        /* Asegurar que los modelos 3D también tengan altura fija */
+        #mclaren-canvas,
+        #f1-2026-canvas,
+        #gt40-canvas {
+            height: 16rem !important;
+            max-height: 16rem !important;
         }
     </style>
 </x-app-layout>
