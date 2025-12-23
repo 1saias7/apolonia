@@ -69,8 +69,9 @@ RUN php artisan key:generate && \
     php artisan route:cache && \
     php artisan view:cache
 
-# Ejecutar migraciones (creará las tablas de users, etc)
-RUN php artisan migrate --force
+# Ejecutar migraciones y seeders
+RUN php artisan migrate --force && \
+    php artisan db:seed --force
 
 # Exponer puerto 8080
 EXPOSE 8080
