@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Alexis',
             'email' => 'alexis@app.cl',
-            'password' => Hash::make('Alexis2024!'),
+            'password' => Hash::make('torini2024!'),
             'email_verified_at' => now(),
         ]);
 
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Johnson',
             'email' => 'johnson@app.cl',
-            'password' => Hash::make('Johnson2024!'),
+            'password' => Hash::make('enamorado2024!'),
             'email_verified_at' => now(),
         ]);
     }
