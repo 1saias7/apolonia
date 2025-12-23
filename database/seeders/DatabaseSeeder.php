@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear usuario administrador
+        // Usuario Administrador
         User::create([
             'name' => 'Admin',
             'email' => 'admin@app.cl',
@@ -24,7 +24,44 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Puedes crear más usuarios si lo necesitas
-        // User::factory(5)->create();
+        // Isaías
+        User::create([
+            'name' => 'Isaías',
+            'email' => 'isaias@app.cl',
+            'password' => Hash::make('Isaias2024!'),
+            'email_verified_at' => now(),
+        ]);
+
+        // Manolo
+        User::create([
+            'name' => 'Manolo',
+            'email' => 'manolo@app.cl',
+            'password' => Hash::make('Manolo2024!'),
+            'email_verified_at' => now(),
+        ]);
+
+        // João
+        User::create([
+            'name' => 'João',
+            'email' => 'joao@app.cl',
+            'password' => Hash::make('Joao2024!'),
+            'email_verified_at' => now(),
+        ]);
+
+        // Alexis
+        User::create([
+            'name' => 'Alexis',
+            'email' => 'alexis@app.cl',
+            'password' => Hash::make('Alexis2024!'),
+            'email_verified_at' => now(),
+        ]);
+
+        // Johnson
+        User::create([
+            'name' => 'Johnson',
+            'email' => 'johnson@app.cl',
+            'password' => Hash::make('Johnson2024!'),
+            'email_verified_at' => now(),
+        ]);
     }
 }
