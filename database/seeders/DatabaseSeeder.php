@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         // Crear usuario administrador
         User::create([
-            'name' => 'Administrador OYM',
+            'name' => 'Admin',
             'email' => 'admin@app.cl',
             'password' => Hash::make('CR_OymApp#2024'),
             'email_verified_at' => now(),
