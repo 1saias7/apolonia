@@ -32,36 +32,12 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Manolo
-        User::create([
-            'name' => 'Manolo',
-            'email' => 'manolo@app.cl',
-            'password' => Hash::make('Manolo2024!'),
-            'email_verified_at' => now(),
-        ]);
-
-        // João
-        User::create([
-            'name' => 'João',
-            'email' => 'joao@app.cl',
-            'password' => Hash::make('Joao2024!'),
-            'email_verified_at' => now(),
-        ]);
-
-        // Alexis
-        User::create([
-            'name' => 'Alexis',
-            'email' => 'alexis@app.cl',
-            'password' => Hash::make('torini2024!'),
-            'email_verified_at' => now(),
-        ]);
-
-        // Johnson
-        User::create([
-            'name' => 'Johnson',
-            'email' => 'johnson@app.cl',
-            'password' => Hash::make('enamorado2024!'),
-            'email_verified_at' => now(),
-        ]);
+        // Puedes agregar más seeders aquí
+        // User::create([
+        //     'name' => 'Isaías',
+        //     'email' => 'isaias@app.cl',
+        //     'password' => Hash::make('Isaias2024!'),
+        //     'email_verified_at' => now(),
+        // ]);
     }
 }
