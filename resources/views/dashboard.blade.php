@@ -161,6 +161,16 @@
                                 🖱️ Arrastra para rotar | ✋ Shift + Arrastre para mover
                             </div>
                         </div>
+                        
+                        <!-- Velocímetro McLaren -->
+                        <div class="mt-4 bg-black/30 rounded-lg p-4">
+                            <p class="text-center text-slate-300 text-xs mb-2">VELOCIDAD MÁXIMA</p>
+                            <div class="chart-container-speedometer">
+                                <canvas id="speedometer-mclaren"></canvas>
+                            </div>
+                            <p class="text-center text-white text-2xl font-bold mt-2">340 km/h</p>
+                        </div>
+                        
                         <div class="mt-4 text-slate-300 text-xs space-y-1">
                             <p>⚡ Motor: Honda V12</p>
                             <p>🏆 Victorias: 8 Grandes Premios</p>
@@ -178,6 +188,16 @@
                                 🖱️ Arrastra para rotar | ✋ Shift + Arrastre para mover
                             </div>
                         </div>
+                        
+                        <!-- Velocímetro F1 2026 -->
+                        <div class="mt-4 bg-black/30 rounded-lg p-4">
+                            <p class="text-center text-slate-300 text-xs mb-2">VELOCIDAD MÁXIMA</p>
+                            <div class="chart-container-speedometer">
+                                <canvas id="speedometer-f1"></canvas>
+                            </div>
+                            <p class="text-center text-white text-2xl font-bold mt-2">360 km/h</p>
+                        </div>
+                        
                         <div class="mt-4 text-slate-300 text-xs space-y-1">
                             <p>⚡ Híbrido Avanzado</p>
                             <p>🔋 50% Eléctrico / 50% Combustión</p>
@@ -195,6 +215,16 @@
                                 🖱️ Arrastra para rotar | ✋ Shift + Arrastre para mover
                             </div>
                         </div>
+                        
+                        <!-- Velocímetro GT40 -->
+                        <div class="mt-4 bg-black/30 rounded-lg p-4">
+                            <p class="text-center text-slate-300 text-xs mb-2">VELOCIDAD MÁXIMA</p>
+                            <div class="chart-container-speedometer">
+                                <canvas id="speedometer-gt40"></canvas>
+                            </div>
+                            <p class="text-center text-white text-2xl font-bold mt-2">320 km/h</p>
+                        </div>
+                        
                         <div class="mt-4 text-slate-300 text-xs space-y-1">
                             <p>⚡ Motor: V8 7.0L</p>
                             <p>🏆 4 victorias consecutivas Le Mans</p>
@@ -598,14 +628,74 @@
             tableBody.appendChild(row);
         });
 
+        // ==================== VELOCÍMETROS (TACÓMETROS) ====================
+        function createSpeedometer(canvasId, maxSpeed, currentSpeed, color) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            // Calcular porcentaje
+            const percentage = (currentSpeed / maxSpeed) * 100;
+            const remaining = 100 - percentage;
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [percentage, remaining],
+                        backgroundColor: [
+                            color,
+                            'rgba(30, 30, 30, 0.3)'
+                        ],
+                        borderWidth: 0,
+                        circumference: 180,
+                        rotation: 270
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    afterDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                        const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2 + 20;
+                        
+                        ctx.save();
+                        ctx.font = 'bold 16px sans-serif';
+                        ctx.fillStyle = '#ffffff';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(currentSpeed + ' km/h', centerX, centerY);
+                        ctx.restore();
+                    }
+                }]
+            });
+        }
+
+        // Crear los 3 velocímetros
+        createSpeedometer('speedometer-mclaren', 380, 340, 'rgba(239, 68, 68, 0.9)');   // Rojo McLaren
+        createSpeedometer('speedometer-f1', 400, 360, 'rgba(59, 130, 246, 0.9)');       // Azul F1
+        createSpeedometer('speedometer-gt40', 380, 320, 'rgba(251, 146, 60, 0.9)');     // Naranja GT40
+
         // ==================== MODELOS 3D ====================
-        function init3DModel(canvasId, modelPath, cameraZ = 5) {
+        function init3DModel(canvasId, modelPath, cameraZ = 3.5) {
             const canvas = document.getElementById(canvasId);
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x1a1a1a);
 
-            const camera = new THREE.PerspectiveCamera(45, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
-            camera.position.set(0, 2, cameraZ);
+            const camera = new THREE.PerspectiveCamera(50, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
+            camera.position.set(0, 1.5, cameraZ);
+            camera.lookAt(0, 0, 0);
 
             const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
             renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
@@ -613,19 +703,19 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
             // Luces mejoradas
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambientLight);
 
-            const spotLight1 = new THREE.SpotLight(0xffffff, 1.5);
+            const spotLight1 = new THREE.SpotLight(0xffffff, 2);
             spotLight1.position.set(5, 10, 5);
             spotLight1.castShadow = true;
             scene.add(spotLight1);
 
-            const spotLight2 = new THREE.SpotLight(0xffffff, 1);
+            const spotLight2 = new THREE.SpotLight(0xffffff, 1.5);
             spotLight2.position.set(-5, 8, -5);
             scene.add(spotLight2);
 
-            const fillLight = new THREE.DirectionalLight(0x6699ff, 0.4);
+            const fillLight = new THREE.DirectionalLight(0x6699ff, 0.5);
             fillLight.position.set(0, 5, -10);
             scene.add(fillLight);
 
@@ -633,10 +723,10 @@
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.enableZoom = false;  // ❌ Deshabilitar zoom
-            controls.enablePan = true;    // ✅ Permitir mover
-            controls.maxPolarAngle = Math.PI / 2;
-            controls.minPolarAngle = 0;
+            controls.enableZoom = false;
+            controls.enablePan = true;
+            controls.maxPolarAngle = Math.PI / 2.2;
+            controls.minPolarAngle = Math.PI / 6;
 
             // Grupo para centrar el modelo correctamente
             const modelGroup = new THREE.Group();
@@ -644,7 +734,7 @@
 
             // Variables para rotación por pasos
             let currentStep = 0;
-            const rotationSteps = [0, Math.PI / 2, Math.PI, Math.PI * 1.5]; // 0°, 90°, 180°, 270°
+            const rotationSteps = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
             let targetRotation = 0;
             let currentRotation = 0;
 
@@ -655,18 +745,25 @@
                 function (gltf) {
                     const model = gltf.scene;
                     
-                    // Calcular bounding box para centrar PERFECTAMENTE
+                    // Calcular bounding box MEJORADO
                     const box = new THREE.Box3().setFromObject(model);
                     const center = box.getCenter(new THREE.Vector3());
                     const size = box.getSize(new THREE.Vector3());
                     
-                    // Centrar el modelo en el origen
+                    // Crear un wrapper para mejor control
+                    const wrapper = new THREE.Object3D();
+                    wrapper.add(model);
+                    
+                    // Centrar el modelo en el wrapper
                     model.position.set(-center.x, -center.y, -center.z);
                     
-                    // Escalar apropiadamente para que quepa bien
+                    // Escalar para que ocupe buen espacio visual
                     const maxDim = Math.max(size.x, size.y, size.z);
-                    const scale = 2.5 / maxDim;
-                    model.scale.set(scale, scale, scale);
+                    const scale = 3 / maxDim;
+                    wrapper.scale.set(scale, scale, scale);
+                    
+                    // Ajustar altura para que quede centrado verticalmente
+                    wrapper.position.y = 0;
                     
                     // Habilitar sombras y mejorar materiales
                     model.traverse(function (node) {
@@ -675,14 +772,14 @@
                             node.receiveShadow = true;
                             
                             if (node.material) {
-                                node.material.metalness = 0.7;
-                                node.material.roughness = 0.3;
+                                node.material.metalness = 0.8;
+                                node.material.roughness = 0.25;
                             }
                         }
                     });
                     
-                    // Agregar al grupo (esto permite rotación alrededor del centro real)
-                    modelGroup.add(model);
+                    // Agregar wrapper al grupo
+                    modelGroup.add(wrapper);
                 },
                 function (xhr) {
                     console.log(canvasId + ': ' + (xhr.loaded / xhr.total * 100) + '% cargado');
@@ -693,8 +790,8 @@
             );
 
             // Suelo con grid
-            const gridHelper = new THREE.GridHelper(10, 10, 0x333333, 0x222222);
-            gridHelper.position.y = -1.5;
+            const gridHelper = new THREE.GridHelper(8, 8, 0x444444, 0x222222);
+            gridHelper.position.y = -1.2;
             scene.add(gridHelper);
 
             // Rotación por pasos cada 3 segundos
@@ -735,10 +832,10 @@
             });
         }
 
-        // Inicializar los 3 modelos
-        init3DModel('mclaren-canvas', '/models/mp46.glb', 4);
-        init3DModel('f1-2026-canvas', '/models/f1_2026.glb', 4);
-        init3DModel('gt40-canvas', '/models/gt40.glb', 4);
+        // Inicializar los 3 modelos con zoom más cercano
+        init3DModel('mclaren-canvas', '/models/mp46.glb', 3.2);
+        init3DModel('f1-2026-canvas', '/models/f1_2026.glb', 3.2);
+        init3DModel('gt40-canvas', '/models/gt40.glb', 3.2);
     </script>
 
     <style>
@@ -767,6 +864,17 @@
         /* Prevenir que los canvas crezcan infinitamente */
         .chart-container canvas {
             max-height: 300px !important;
+        }
+
+        /* Contenedores de velocímetros */
+        .chart-container-speedometer {
+            position: relative;
+            height: 120px;
+            width: 100%;
+        }
+
+        .chart-container-speedometer canvas {
+            max-height: 120px !important;
         }
 
         /* Estilos para Canvas 3D */
